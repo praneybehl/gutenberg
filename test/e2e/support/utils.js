@@ -63,9 +63,36 @@ export async function newPost( postType ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 }
 
+export async function getWindowWidth() {
+	return await page.evaluate(
+		() => {
+			return window.innerWidth;
+		}
+	);
+}
+
 export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
+	await setDesktopViewPort();
+}
+
+export async function newMobileBrowserPage() {
+	global.page = await browser.newPage();
+	await setMobileViewPort();
+}
+
+export async function setDesktopViewPort() {
 	await page.setViewport( { width: 1000, height: 700 } );
+	if ( 1000 !== ( await getWindowWidth() ) ) {
+		throw 'An error ocurred while setting the desktop viewport';
+	}
+}
+
+export async function setMobileViewPort() {
+	await page.setViewport( { width: 500, height: 700 } );
+	if ( 500 !== ( await getWindowWidth() ) ) {
+		throw 'An error ocurred while setting the mobile viewport';
+	}
 }
 
 export async function switchToEditor( mode ) {
@@ -79,6 +106,13 @@ export async function getHTMLFromCodeEditor() {
 	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 	await switchToEditor( 'Visual' );
 	return textEditorContent;
+}
+
+export async function clearLocalStorage() {
+	await page.$eval( 'body', ( body ) => {
+		const doc = body.ownerDocument;
+		doc.defaultView.localStorage.clear();
+	} );
 }
 
 /**
