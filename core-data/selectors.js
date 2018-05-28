@@ -153,10 +153,10 @@ export function getEntityRecord( state, kind, name, key ) {
  */
 export const getEntityRecords = createSelector(
 	( state, kind, name ) => {
-		return Object.values( state.entities[ kind ][ name ].byKey );
+		return Object.values( get( state.entities.data, [ kind, name, 'byKey' ] ) );
 	},
 	( state, kind, name ) => ( [
-		state.entities[ kind ][ name ].byKey,
+		get( state.entities.data, [ kind, name, 'byKey' ] ),
 	]	)
 );
 
