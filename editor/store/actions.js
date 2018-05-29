@@ -11,6 +11,7 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -387,14 +388,34 @@ export function mergeBlocks( blockAUid, blockBUid ) {
 }
 
 /**
- * Returns an action object used in signalling that the post should autosave.
- *
- * @return {Object} Action object.
+ * Action creator triggering the autosave behavior
  */
-export function autosave() {
-	return {
-		type: 'AUTOSAVE',
-	};
+export function* autosave() {
+	const {
+		isEditedPostSaveable,
+		isEditedPostDirty,
+		isEditedPostNew,
+		isCurrentPostPublished,
+	} = select( 'core/editor' );
+
+	if ( ! isEditedPostSaveable() ) {
+		return;
+	}
+
+	if ( ! isEditedPostNew() && ! isEditedPostDirty() ) {
+		return;
+	}
+
+	if ( isCurrentPostPublished() ) {
+		// TODO: Publish autosave.
+		//  - Autosaves are created as revisions for published posts, but
+		//    the necessary REST API behavior does not yet exist
+		//  - May need to check for whether the status of the edited post
+		//    has changed from the saved copy (i.e. published -> pending)
+		return;
+	}
+
+	yield savePost();
 }
 
 /**

@@ -270,14 +270,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'autosave', () => {
-		it( 'should return AUTOSAVE action', () => {
-			expect( autosave() ).toEqual( {
-				type: 'AUTOSAVE',
-			} );
-		} );
-	} );
-
 	describe( 'redo', () => {
 		it( 'should return REDO action', () => {
 			expect( redo() ).toEqual( {

@@ -35,7 +35,6 @@ import {
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
-	savePost,
 	saveSharedBlock,
 	insertBlock,
 	removeBlocks,
@@ -49,10 +48,6 @@ import {
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	isCurrentPostPublished,
-	isEditedPostDirty,
-	isEditedPostNew,
-	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
 	getBlockRootUID,
@@ -301,28 +296,6 @@ export default {
 				...blocksWithTheSameType.slice( 1 ),
 			]
 		) );
-	},
-	AUTOSAVE( action, store ) {
-		const { getState, dispatch } = store;
-		const state = getState();
-		if ( ! isEditedPostSaveable( state ) ) {
-			return;
-		}
-
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
-		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
-			return;
-		}
-
-		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action, { getState } ) {
 		const { post } = action;
