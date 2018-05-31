@@ -70,6 +70,14 @@ class ItemList extends Component {
 			>
 				{ items.map( ( item ) => {
 					const isCurrent = current && current.id === item.id;
+					const itemIconStyle = item.icon ? {
+						backgroundColor: item.icon.background,
+						color: item.icon.foreground,
+					} : {};
+					const itemIconStackStyle = item.icon && item.icon.shadowColor ? {
+						backgroundColor: item.icon.shadowColor,
+					} : {};
+
 					return (
 						<button
 							role="menuitem"
@@ -92,9 +100,17 @@ class ItemList extends Component {
 							onBlur={ () => onHover( null ) }
 							aria-label={ item.title } // Fix for IE11 and JAWS 2018.
 						>
-							<span className="editor-inserter__item-icon">
-								<BlockIcon icon={ item.icon } />
-								{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
+							<span
+								className="editor-inserter__item-icon"
+								style={ itemIconStyle }
+							>
+								<BlockIcon icon={ item.icon && item.icon.src } />
+								{ item.hasChildBlocks &&
+									<span
+										className="editor-inserter__item-icon-stack"
+										style={ itemIconStackStyle }
+									/>
+								}
 							</span>
 
 							<span className="editor-inserter__item-title">
