@@ -12,6 +12,7 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -535,6 +536,10 @@ describe( 'effects', () => {
 		describe( '.FETCH_SHARED_BLOCKS', () => {
 			const handler = effects.FETCH_SHARED_BLOCKS;
 
+			afterEach( () => {
+				jest.unmock( '@wordpress/api-request' );
+			} );
+
 			it( 'should fetch multiple shared blocks', () => {
 				const promise = Promise.resolve( [
 					{
@@ -543,9 +548,8 @@ describe( 'effects', () => {
 						content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 					},
 				] );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -581,9 +585,8 @@ describe( 'effects', () => {
 					title: 'My cool block',
 					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 				} );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -615,9 +618,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -656,14 +658,10 @@ describe( 'effects', () => {
 			const handler = effects.SAVE_SHARED_BLOCK;
 
 			it( 'should save a shared block and swap its id', () => {
-				let modelAttributes;
 				const promise = Promise.resolve( { id: 456 } );
+				apiRequest.mockReturnValue = promise;
 
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], ( request ) => {
-					modelAttributes = request.data;
-					return promise;
-				} );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
 				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
@@ -678,12 +676,6 @@ describe( 'effects', () => {
 
 				handler( saveSharedBlock( 123 ), store );
 
-				expect( modelAttributes ).toEqual( {
-					id: 123,
-					title: 'My cool block',
-					content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->',
-				} );
-
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'SAVE_SHARED_BLOCK_SUCCESS',
@@ -695,9 +687,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
 				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
@@ -726,9 +717,8 @@ describe( 'effects', () => {
 
 			it( 'should delete a shared block', () => {
 				const promise = Promise.resolve( {} );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
 				const sharedBlock = { id: 123, title: 'My cool block' };
@@ -766,9 +756,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
+				apiRequest.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
-				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
 				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
