@@ -1,7 +1,14 @@
 /**
+ * External Dependencies
+ */
+
+ import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { select } from '@wordpress/data';
 
 /**
  * Returns the Post's Edit URL.
@@ -23,7 +30,8 @@ export function getPostEditUrl( postId ) {
  * @return {string} WPAdmin URL.
  */
 export function getWPAdminURL( page, query ) {
-	const url = ( window._wpAdminURL ) ? window._wpAdminURL + page : page;
+	const settings = select( 'core/editor' ).getEditorSettings();
+	const url = get( settings, 'wpAdminURL', '' ) + page;
 	return addQueryArgs( url, query );
 }
 
